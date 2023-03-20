@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Détection de visage avec ml5.js</title>
+</head>
+<body>
+
+
+
+
+
+
+<!-- Import de la bibliothèque ml5.js -->
+<script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
+
+
+<!-- Import de la bibliothèque p5.js -->
+<script src="https://cdn.jsdelivr.net/npm/p5@1.6.0/lib/p5.js"></script>
+
+<script>
+    let video;
+    let detector;
+
+    function setup() {
+        createCanvas(640, 480);
+        video = createCapture(VIDEO);
+        video.size(width, height);
+        detector = ml5.facemesh(modelReady);
+    }
+
+    function modelReady() {
+        console.log("Modèle de détection de visage chargé !");
+        detector.on("predict", gotFaces);
+    }
+
+    function gotFaces(results) {
+        clear();
+        for (let i = 0; i < results.length; i++) {
+            const { topLeft, bottomRight } = results[i].boundingBox;
+            const width = bottomRight[0] - topLeft[0];
+            const height = bottomRight[1] - topLeft[1];
+            noFill();
+            stroke(255, 0, 0);
+            strokeWeight(4);
+            rect(topLeft[0], topLeft[1], width, height);
+            const { landmarks } = results[i];
+            const nose = landmarks[4];
+            const radius = Math.abs(nose[0] - nose[2]);
+            noFill();
+            stroke(255, 0, 0);
+            strokeWeight(4);
+            circle(nose[0], nose[1], radius);
+
+        }
+    }
+
+
+</script>
+</body>
+</html>

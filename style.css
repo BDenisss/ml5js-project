@@ -1,0 +1,16 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+h1 {
+    text-align: center;
+    font-size: 64px;
+}
+
+img {
+    height: 900px;
+    width: 800px;
+    object-fit: cover;
+}
