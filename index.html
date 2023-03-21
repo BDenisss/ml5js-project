@@ -1,63 +1,60 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Détection de visage avec ml5.js</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Détection des points de repère faciaux</title>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.6.0/lib/p5.js"></script>
+  <script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    canvas {
+      border: 1px solid;
+    }
+  </style>
 </head>
 <body>
-
-
-
-
-
-
-<!-- Import de la bibliothèque ml5.js -->
-<script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
-
-
-<!-- Import de la bibliothèque p5.js -->
-<script src="https://cdn.jsdelivr.net/npm/p5@1.6.0/lib/p5.js"></script>
-
-<script>
+  <script>
     let video;
-    let detector;
+    let faceFeatureExtractor;
+    let landmarks = [];
 
     function setup() {
-        createCanvas(640, 480);
-        video = createCapture(VIDEO);
-        video.size(width, height);
-        detector = ml5.facemesh(modelReady);
+      createCanvas(640, 480);
+      video = createCapture(VIDEO);
+      video.size(width, height);
+      video.hide();
+
+      faceFeatureExtractor = ml5.facemesh(video, modelReady);
     }
 
     function modelReady() {
-        console.log("Modèle de détection de visage chargé !");
-        detector.on("predict", gotFaces);
+      console.log('Modèle chargé !');
+      faceFeatureExtractor.on('predict', gotResults);
     }
 
-    function gotFaces(results) {
-        clear();
-        for (let i = 0; i < results.length; i++) {
-            const { topLeft, bottomRight } = results[i].boundingBox;
-            const width = bottomRight[0] - topLeft[0];
-            const height = bottomRight[1] - topLeft[1];
-            noFill();
-            stroke(255, 0, 0);
-            strokeWeight(4);
-            rect(topLeft[0], topLeft[1], width, height);
-            const { landmarks } = results[i];
-            const nose = landmarks[4];
-            const radius = Math.abs(nose[0] - nose[2]);
-            noFill();
-            stroke(255, 0, 0);
-            strokeWeight(4);
-            circle(nose[0], nose[1], radius);
-
-        }
+    function gotResults(results) {
+      if (results && results[0]) {
+        landmarks = results[0].scaledMesh;
+      }
     }
 
+    function draw() {
+      image(video, 0, 0, width, height);
 
-</script>
+      for (let i = 0; i < landmarks.length; i++) {
+        const [x, y] = landmarks[i];
+        fill(0, 255, 0);
+        ellipse(x, y, 5);
+      }
+    }
+  </script>
 </body>
 </html>
